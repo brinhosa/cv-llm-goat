@@ -42,9 +42,9 @@ for k,v in m.items():
 # Include all text (including hidden layers)
 for page in doc:
     text += page.get_text()
-# Include annotations
+# Include annotations (page.annots() returns None when a page has none)
 for page in doc:
-    for annot in page.annots():
+    for annot in (page.annots() or []):
         content = annot.info.get('content','')
         if content:
             text += f'\n[PDF ANNOTATION]: {content}\n'

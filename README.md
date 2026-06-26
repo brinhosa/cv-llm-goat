@@ -98,6 +98,17 @@ No key is shipped with this repo. Without `.env`, everything runs on the mock en
 5. Optional: upload a weaponized PDF from `output/` (white text, metadata, micro-font,
    hidden annotation, zero-width chars, combined).
 
+## Tests
+
+Offline smoke tests (mock engine — no network, no API key) cover the core
+claims: the vulnerable grader is hijacked, the hardened grader resists, the
+defenses primitives behave, and the API + PDF extraction work end to end.
+
+```bash
+pip install pytest httpx
+pytest -q
+```
+
 ## Weaponized sample PDFs
 
 `output/` ships a clean control résumé plus six injection variants. Regenerate them:
