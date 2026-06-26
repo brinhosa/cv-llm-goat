@@ -5,8 +5,34 @@
 > deploy it on a public or untrusted network. Educational / authorized use only.
 
 A live, audience-facing demo of **indirect prompt injection** — OWASP **LLM01** — in
-an AI résumé grader, plus the **hardened** version that defeats it. Built for a
-**BSides Porto** talk.
+an AI résumé grader, plus the **hardened** version that defeats it.
+
+## Talk
+
+**Reading Between the Lines: Exploiting Indirect Injection in AI Systems**
+Michael Reimsbach & Rafael B. Brinhosa — BSides Porto • 15:30 – 16:20
+
+We've moved past the era of users manually bypassing chatbot filters with *"Ignore
+previous instructions."* and entered a more dangerous era: **indirect injection**.
+
+The 2025 **EchoLeak** exploit first proved that a single unread email could trigger
+Microsoft Copilot to silently exfiltrate private data without a single user click.
+This was followed by the 2026 **Claude Code hijacks**, which demonstrated that a
+poisoned `.CLAUDE.md` file in a repository could allow an attacker to execute
+arbitrary shell commands and harvest sensitive environment variables.
+
+The fundamental lack of a security boundary between *data* and *instructions* causes
+LLMs to treat every input as a potential command — transforming seemingly benign
+files such as a CV or a RAG chunk into an injection vector that can force the model to
+ignore its safety boundaries.
+
+This session deconstructs real-world injection attacks and the obfuscation techniques
+that make them effective: hidden metadata, Unicode steganography, and homoglyph
+substitution tunnelling malicious instructions through "invisible" channels. We
+conclude with a hardened design pattern for resilient LLMs — so your agents can
+process untrusted data without compromising their internal logic.
+
+This repo is the live demo for that talk.
 
 A candidate uploads a résumé. An LLM scores it 1–10 and recommends Advance / Hold /
 Reject. The résumé hides instructions a human reviewer never sees — but the model does.
@@ -103,3 +129,7 @@ output/            sample clean + weaponized PDFs
 
 MIT, with an educational-use notice — see [LICENSE](LICENSE). Intentionally
 vulnerable; use responsibly and only against systems you are authorized to test.
+
+## Authors
+
+Michael Reimsbach & Rafael B. Brinhosa — BSides Porto.
