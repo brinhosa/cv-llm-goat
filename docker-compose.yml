@@ -1,0 +1,20 @@
+# Standalone local run of the CV LLM GOAT.
+#   docker compose up --build   ->  http://localhost:8090
+#
+# Intentionally vulnerable. Do NOT expose this on a public/untrusted network.
+# No auth, no rate limit, no TLS — local learning only.
+services:
+  cv-llm-goat:
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+    container_name: cv-llm-goat
+    ports:
+      - "8090:8090"
+    environment:
+      - BASE_PATH=
+    # Optional real LLM. Copy .env.example -> .env (gitignored) to enable.
+    # Without it the app runs the offline mock engine.
+    env_file:
+      - path: .env
+        required: false

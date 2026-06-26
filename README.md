@@ -1,0 +1,105 @@
+# CV LLM GOAT — Vulnerable AI Resume Grader
+
+> ⚠️ **Intentionally vulnerable, by design.** This is a teaching target (a "GOAT",
+> like OWASP WebGoat) for **LLM prompt injection**. Run it **locally only**. Do not
+> deploy it on a public or untrusted network. Educational / authorized use only.
+
+A live, audience-facing demo of **indirect prompt injection** — OWASP **LLM01** — in
+an AI résumé grader, plus the **hardened** version that defeats it. Built for a
+**BSides Porto** talk.
+
+A candidate uploads a résumé. An LLM scores it 1–10 and recommends Advance / Hold /
+Reject. The résumé hides instructions a human reviewer never sees — but the model does.
+
+- **Page A — Vulnerable:** résumé text is dumped straight into the LLM prompt. A CV
+  with a hidden payload hijacks the grader → a mediocre CV gets `10/10` / "Advance".
+- **Page B — Hardened:** sanitization + injection detection + prompt envelope
+  (untrusted-data delimiters) + strict output validation → the same CV gets its real
+  grade and the injection is flagged.
+
+## What it teaches
+
+| Control (`webapp/defenses.py`) | Mitigates |
+|---|---|
+| `sanitize()` (strips zero-width / invisible chars) | hidden-text smuggling / input validation |
+| `detect_injection()` | LLM01 — defense-in-depth detection |
+| `build_enveloped_prompt()` | LLM01 — structural: untrusted-data framing |
+| `validate_output()` | LLM05 — Improper Output Handling (schema/range) |
+
+Heuristic detection alone is not enough — the **prompt envelope + output validation**
+are the structural controls; the detector just makes the attack visible on stage.
+
+## Run it
+
+### Option A — Python
+
+```bash
+cd webapp
+pip install -r requirements.txt
+uvicorn app:app --reload --port 8090
+```
+
+Open <http://localhost:8090>.
+
+### Option B — Docker
+
+```bash
+docker compose up --build      # -> http://localhost:8090
+```
+
+No API key needed: the default **mock** engine is offline, deterministic and
+stage-safe (it reproduces the same hijack/defense behavior without any network call).
+
+### Optional: real LLM
+
+To grade with a real model (DeepSeek, OpenAI-compatible), bring **your own** key:
+
+```bash
+cp .env.example .env
+# edit .env and set DEEPSEEK_API_KEY=sk-...
+```
+
+No key is shipped with this repo. Without `.env`, everything runs on the mock engine.
+
+## Live demo script
+
+1. **Page A**, engine `mock` → default clean CV → *Grade* → ~6/10 "Hold".
+2. Pick a payload (e.g. `direct_override`) → **💉 Inject (hidden)** (wraps it in
+   zero-width chars, like a real attacker) → *Grade* → **10/10, hijack banner**.
+3. Show the **"Exact prompt sent"** panel: résumé content lands where instructions go.
+4. Switch to **Page B** → *Grade* the same text → injection flagged, score restored,
+   output validated. Show the prompt envelope (`<resume_data>…</resume_data>`).
+5. Optional: upload a weaponized PDF from `output/` (white text, metadata, micro-font,
+   hidden annotation, zero-width chars, combined).
+
+## Weaponized sample PDFs
+
+`output/` ships a clean control résumé plus six injection variants. Regenerate them:
+
+```bash
+pip install pymupdf
+python create_fictional_resume.py     # clean résumé
+python weaponize_resume.py            # 6 hidden-injection layers
+```
+
+All résumé data is **fictional** ("Alex Morgan") — no real person, no real PII.
+
+## Layout
+
+```
+webapp/            FastAPI app + single-page UI (tabs A/B)
+  app.py           routes: /, /api/seed, /api/grade
+  grader.py        vulnerable vs. fixed flows; real (DeepSeek) + mock engines
+  defenses.py      the Page B controls
+  extract.py       .txt / .pdf text extraction (incl. hidden layers)
+  static/          index.html + app.js
+payloads.py        injection payload library + fictional candidate
+create_fictional_resume.py / weaponize_resume.py   PDF tooling
+test_with_cli.py / test_with_llm.py                test harnesses
+output/            sample clean + weaponized PDFs
+```
+
+## License
+
+MIT, with an educational-use notice — see [LICENSE](LICENSE). Intentionally
+vulnerable; use responsibly and only against systems you are authorized to test.
