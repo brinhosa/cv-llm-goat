@@ -10,7 +10,7 @@ an AI résumé grader, plus the **hardened** version that defeats it.
 ## Talk
 
 **Reading Between the Lines: Exploiting Indirect Injection in AI Systems**
-Michael Reimsbach & Rafael B. Brinhosa — BSides Porto • 15:30 – 16:20
+Michael Reimsbach & Rafael B. Brinhosa — BSides Porto • 15:30 – 16:20, follow-up at BSides Lisbon
 
 We've moved past the era of users manually bypassing chatbot filters with *"Ignore
 previous instructions."* and entered a more dangerous era: **indirect injection**.
@@ -121,15 +121,35 @@ python weaponize_resume.py            # 6 hidden-injection layers
 
 All résumé data is **fictional** ("Alex Morgan") — no real person, no real PII.
 
+## BSides Lisbon follow-up: NeMo Guardrails + Jev
+
+Tabs **C** and **D** put an NVIDIA NeMo Guardrails input rail in front of the naive grader:
+
+* **C · NeMo (LLM):** NeMo's `self check input` rail, DeepSeek as the judge.
+* **D · NeMo + Jev → LLM:** a NeMo rail backed by TypeSafe Jev (System One). Jev decides when it is
+  confident; unsure cases go to the LLM judge.
+
+Both need keys in `.env` (`DEEPSEEK_API_KEY`, and `TYPESAFE_API_KEY` for D). Without them, the tabs
+return a clear error and tabs A/B keep working offline.
+
+The benchmark behind the talk (detection quality, latency, and an adaptive LLM attacker) is in
+[`nemo_lab/`](nemo_lab/), with the write-up in [`nemo_lab/REPORT.md`](nemo_lab/REPORT.md). Headline on
+our synthetic corpus: Jev inside NeMo matched the LLM judge's detection at about 5x lower median latency,
+and the Jev → LLM cascade removed Jev's false positives while sending only 8% of resumes to the LLM.
+
 ## Layout
 
 ```
-webapp/            FastAPI app + single-page UI (tabs A/B)
+webapp/            FastAPI app + single-page UI (tabs A/B/C/D)
   app.py           routes: /, /api/seed, /api/grade
   grader.py        vulnerable vs. fixed flows; real (DeepSeek) + mock engines
   defenses.py      the Page B controls
   extract.py       .txt / .pdf text extraction (incl. hidden layers)
   static/          index.html + app.js
+  guards.py        NeMo Guardrails input rails for tabs C/D
+  jev_client.py    TypeSafe Jev client
+  rails/           NeMo configs (selfcheck, cascade)
+nemo_lab/          BSides Lisbon benchmark: NeMo vs NeMo + Jev (REPORT.md)
 payloads.py        injection payload library + fictional candidate
 create_fictional_resume.py / weaponize_resume.py   PDF tooling
 test_with_cli.py / test_with_llm.py                test harnesses
@@ -143,4 +163,4 @@ vulnerable; use responsibly and only against systems you are authorized to test.
 
 ## Authors
 
-Michael Reimsbach & Rafael B. Brinhosa — BSides Porto.
+Michael Reimsbach & Rafael B. Brinhosa — BSides Porto and BSides Lisbon.

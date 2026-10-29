@@ -1,0 +1,13 @@
+define bot refuse to respond
+  "I'm sorry, I can't respond to that."
+
+define subflow jev cascade input
+  $decision = execute jev_check_input
+  if $decision == "block"
+    bot refuse to respond
+    stop
+  if $decision == "review"
+    $llm_blocked = execute llm_self_check_blocked
+    if $llm_blocked
+      bot refuse to respond
+      stop

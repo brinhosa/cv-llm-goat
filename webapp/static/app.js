@@ -25,8 +25,10 @@ async function boot() {
 function setMode(m) {
   MODE = m;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.mode === m));
-  document.getElementById("resultTitle").textContent =
-    m === "vulnerable" ? "Result — ⚠️ Naive grader" : "Result — 🛡️ Hardened grader";
+  document.getElementById("resultTitle").textContent = {
+    vulnerable: "Result — ⚠️ Naive grader", fixed: "Result — 🛡️ Hardened grader",
+    nemo: "Result — NeMo self-check (LLM) → naive grader", nemo_jev: "Result — NeMo + Jev → LLM → naive grader",
+  }[m];
 }
 
 function injectPayload() {
@@ -72,7 +74,18 @@ function render(d) {
   const r = d.result || {};
   let html = "";
 
-  if (d.mode === "vulnerable" && (r._hijacked || (r.score >= 9 && (r.weaknesses || []).length === 0)))
+  if (d.guard) {
+    const g = d.guard, j = g.jev;
+    html += g.blocked
+      ? `<div class="flag"><b>🛑 Blocked by input rail</b> in ${g.ms} ms</div>`
+      : `<div class="ok">Input rail allowed it (${g.ms} ms)</div>`;
+    let det = [];
+    if (j) det.push(`Jev risk <b>${j.risk}</b> → ${esc(j.decision)} (${j.ms} ms API, ${esc(j.model || "")})`);
+    det.push(g.llm_judge_used ? "LLM self-check: used" : "LLM self-check: skipped");
+    html += `<p class="note">${det.join(" · ")}</p>`;
+  }
+
+  if ((d.mode === "vulnerable" || d.guard) && (r._hijacked || (r.score >= 9 && (r.weaknesses || []).length === 0)))
     html += `<div class="hijack-banner">⚠️ GRADER HIJACKED — resume content overrode the instructions</div>`;
 
   if (d.parse_failed)

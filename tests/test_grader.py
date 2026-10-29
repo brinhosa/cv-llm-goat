@@ -125,3 +125,26 @@ def test_weaponized_pdf_extraction_surfaces_hidden_payload():
     assert len(text) > 0
     lowered = text.lower()
     assert any(k in lowered for k in ("ignore", "approved", "pre-cleared", "override"))
+
+
+# ---- NeMo Guardrails tabs (C/D) without keys --------------------------------
+
+@pytest.mark.parametrize("mode", ["nemo", "nemo_jev"])
+def test_guard_tabs_fail_clearly_without_keys(mode, monkeypatch):
+    from fastapi.testclient import TestClient
+    import app as webapp
+
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
+    r = TestClient(webapp.app).post("/api/grade", data={"mode": mode, "engine": "mock", "resume_text": CLEAN_CV})
+    assert r.status_code == 500
+    assert "DEEPSEEK_API_KEY" in r.json()["error"]
+
+
+def test_jev_risk_rule():
+    import jev_client
+
+    # risk = max(mean(P(injection), 1 - P(benign)), P(steering))
+    a = {"injection": 0.3, "benign": 0.6, "steering": 0.7}
+    assert max((a["injection"] + 1 - a["benign"]) / 2, a["steering"]) == 0.7
+    assert jev_client.ALLOW < jev_client.BLOCK

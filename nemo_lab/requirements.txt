@@ -1,0 +1,4 @@
+nemoguardrails==0.24.1
+langchain-openai
+openai>=1.0
+httpx

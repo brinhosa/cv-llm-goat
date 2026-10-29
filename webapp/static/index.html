@@ -24,6 +24,7 @@
   .tab.active { color:var(--txt); border-bottom-color:var(--bg); }
   .tab[data-mode=vulnerable].active { border-color:var(--bad); color:var(--bad); }
   .tab[data-mode=fixed].active { border-color:var(--good); color:var(--good); }
+  .tab[data-mode=nemo].active, .tab[data-mode=nemo_jev].active { border-color:#76b900; color:#76b900; }
   main { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:24px 28px; }
   .panel { background:var(--panel); border:1px solid var(--border); border-radius:10px;
            padding:18px; }
@@ -64,10 +65,12 @@
 <body>
 <header>
   <h1>🎓 AI Resume Grader</h1>
-  <span class="tag">BSides Porto — Indirect Prompt Injection Demo</span>
+  <span class="tag">BSides Porto → Lisbon — Indirect Prompt Injection Demo</span>
   <div class="tabs" style="margin-left:auto">
     <div class="tab active" data-mode="vulnerable">A · Vulnerable</div>
     <div class="tab" data-mode="fixed">B · Hardened</div>
+    <div class="tab" data-mode="nemo">C · NeMo (LLM)</div>
+    <div class="tab" data-mode="nemo_jev">D · NeMo + Jev → LLM</div>
   </div>
 </header>
 
@@ -111,7 +114,8 @@
 <footer>
   <b>OWASP LLM Top 10:</b> LLM01 Prompt Injection (core) · LLM05 Improper Output Handling.
   Page B controls: input sanitization · injection detection · prompt envelope (untrusted-data
-  delimiters) · strict output validation. Fictional candidate — no real PII. Educational use only.
+  delimiters) · strict output validation. Pages C/D: NeMo Guardrails input rail (LLM self-check, or
+  TypeSafe Jev with LLM fallback when Jev is unsure) in front of the naive grader. Fictional candidate — no real PII. Educational use only.
 </footer>
 
 <script src="__BASE__/static/app.js"></script>

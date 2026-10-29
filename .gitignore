@@ -10,3 +10,14 @@ venv/
 
 # os
 .DS_Store
+
+# keys mounted as docker secrets / local overrides
+secrets/
+*.key
+*.pem
+.env.*
+!.env.example
+
+# test & run artifacts
+.pytest_cache/
+*.log

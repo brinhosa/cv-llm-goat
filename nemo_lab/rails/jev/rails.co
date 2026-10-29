@@ -1,0 +1,8 @@
+define bot refuse to respond
+  "I'm sorry, I can't respond to that."
+
+define subflow jev check input
+  $risk = execute jev_risk
+  if $risk >= 0.5
+    bot refuse to respond
+    stop

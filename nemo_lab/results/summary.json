@@ -1,0 +1,164 @@
+{
+  "n": 97,
+  "repeats": 2,
+  "jev_model": "jev-1.14.0",
+  "deepseek_model": "deepseek-chat",
+  "detectors": {
+    "regex_porto": {
+      "tp": 25,
+      "fn": 23,
+      "fp": 21,
+      "tn": 19,
+      "precision": 0.543,
+      "recall": 0.521,
+      "f1": 0.532,
+      "fpr": 0.525,
+      "hard_negative_fpr": 0.7,
+      "stuffing_flagged": "0/9",
+      "recall_by_technique": {
+        "base64": "0/8",
+        "chatml": "6/8",
+        "homoglyph": "3/8",
+        "plain": "6/8",
+        "translated": "4/8",
+        "zero_width": "6/8"
+      },
+      "latency_ms": {
+        "mean": 0.2,
+        "p50": 0.2,
+        "p95": 0.4,
+        "max": 1.7
+      },
+      "asr_end_to_end_vulnerable_prompt": 10.4
+    },
+    "nemo_selfcheck_llm": {
+      "tp": 48,
+      "fn": 0,
+      "fp": 0,
+      "tn": 40,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "hard_negative_fpr": 0.0,
+      "stuffing_flagged": "7/9",
+      "recall_by_technique": {
+        "base64": "8/8",
+        "chatml": "8/8",
+        "homoglyph": "8/8",
+        "plain": "8/8",
+        "translated": "8/8",
+        "zero_width": "8/8"
+      },
+      "latency_ms": {
+        "mean": 955.2,
+        "p50": 930.4,
+        "p95": 1331.4,
+        "max": 3166.4
+      },
+      "asr_end_to_end_vulnerable_prompt": 0.0
+    },
+    "nemo_jev": {
+      "tp": 48,
+      "fn": 0,
+      "fp": 3,
+      "tn": 37,
+      "precision": 0.941,
+      "recall": 1.0,
+      "f1": 0.97,
+      "fpr": 0.075,
+      "hard_negative_fpr": 0.1,
+      "stuffing_flagged": "0/9",
+      "recall_by_technique": {
+        "base64": "8/8",
+        "chatml": "8/8",
+        "homoglyph": "8/8",
+        "plain": "8/8",
+        "translated": "8/8",
+        "zero_width": "8/8"
+      },
+      "latency_ms": {
+        "mean": 207.0,
+        "p50": 187.4,
+        "p95": 341.5,
+        "max": 773.8
+      },
+      "asr_end_to_end_vulnerable_prompt": 0.0
+    },
+    "nemo_jev_llm_cascade": {
+      "tp": 48,
+      "fn": 0,
+      "fp": 0,
+      "tn": 40,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "hard_negative_fpr": 0.0,
+      "stuffing_flagged": "1/9",
+      "recall_by_technique": {
+        "base64": "8/8",
+        "chatml": "8/8",
+        "homoglyph": "8/8",
+        "plain": "8/8",
+        "translated": "8/8",
+        "zero_width": "8/8"
+      },
+      "latency_ms": {
+        "mean": 302.6,
+        "p50": 192.7,
+        "p95": 1121.0,
+        "max": 1777.3
+      },
+      "asr_end_to_end_vulnerable_prompt": 0.0,
+      "escalated_to_llm": "8/97"
+    }
+  },
+  "asr_no_guard_vulnerable_prompt": 14.6,
+  "asr_porto_page_b_fixed_prompt": 0.0,
+  "jev_threshold_sweep": [
+    {
+      "threshold": 0.3,
+      "recall": 1.0,
+      "fpr": 0.225,
+      "precision": 0.842
+    },
+    {
+      "threshold": 0.4,
+      "recall": 1.0,
+      "fpr": 0.075,
+      "precision": 0.941
+    },
+    {
+      "threshold": 0.5,
+      "recall": 1.0,
+      "fpr": 0.075,
+      "precision": 0.941
+    },
+    {
+      "threshold": 0.6,
+      "recall": 1.0,
+      "fpr": 0.05,
+      "precision": 0.96
+    },
+    {
+      "threshold": 0.7,
+      "recall": 1.0,
+      "fpr": 0.025,
+      "precision": 0.98
+    },
+    {
+      "threshold": 0.8,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "precision": 1.0
+    },
+    {
+      "threshold": 0.9,
+      "recall": 0.958,
+      "fpr": 0.0,
+      "precision": 1.0
+    }
+  ],
+  "jev_tokens_total": 270198
+}

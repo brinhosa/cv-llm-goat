@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 
 import grader
 import extract
+import guards
 
 # Reuse the payload library + fictional candidate from the parent lab.
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
@@ -92,13 +93,26 @@ async def grade(
     truncated = len(text) > MAX_CHARS
     text = text[:MAX_CHARS]
 
-    if mode not in ("vulnerable", "fixed"):
+    if mode not in ("vulnerable", "fixed", "nemo", "nemo_jev"):
         mode = "vulnerable"
     if engine not in ("real", "mock"):
         engine = "mock"
 
     try:
-        result = grader.grade(text, mode, engine)
+        guard = None
+        if mode in guards.CONFIGS:
+            guard = await guards.check(text, mode)
+            if guard["blocked"]:
+                result = {"mode": mode, "engine": engine, "prompt_sent": "(not sent: blocked by input rail)",
+                          "raw_response": "", "result": None,
+                          "note": "Blocked by NeMo Guardrails input rail before reaching the grader."}
+            else:
+                result = grader.grade(text, "vulnerable", engine)
+                result["mode"] = mode
+                result["note"] = "Input rail allowed it, so it went to the naive grader. The rail is the only defense here."
+            result["guard"] = guard
+        else:
+            result = grader.grade(text, mode, engine)
     except Exception as exc:
         return JSONResponse({"error": str(exc)}, status_code=500)
 

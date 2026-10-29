@@ -1,0 +1,11 @@
+models:
+  - type: main
+    engine: openai
+    model: deepseek-chat
+    parameters:
+      base_url: https://api.deepseek.com
+      temperature: 0
+rails:
+  input:
+    flows:
+      - jev cascade input
