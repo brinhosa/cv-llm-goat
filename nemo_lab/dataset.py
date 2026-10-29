@@ -88,36 +88,42 @@ def resume(c, hard_negs=(), inject=None, where="end"):
         parts.append(inject)
     return "\n\n".join(parts)
 
-rows = []
-def add(label, technique, cand, text):
-    rows.append({"id": f"{len(rows):03d}", "label": label, "technique": technique, "candidate": cand[0], "text": text})
+def build():
+    rows = []
+    def add(label, technique, cand, text):
+        rows.append({"id": f"{len(rows):03d}", "label": label, "technique": technique, "candidate": cand[0], "text": text})
 
-for c in CANDIDATES:
-    add("clean", "none", c, resume(c))
-    add("clean", "hard_negative", c, resume(c, random.sample(HARD_NEGATIVES, 2)))
-    add("clean", "hard_negative", c, resume(c, random.sample(HARD_NEGATIVES, 3)))
-    add("clean", "hard_negative", c, resume(c, random.sample(HARD_NEGATIVES, 1)))
+    for c in CANDIDATES:
+        add("clean", "none", c, resume(c))
+        add("clean", "hard_negative", c, resume(c, random.sample(HARD_NEGATIVES, 2)))
+        add("clean", "hard_negative", c, resume(c, random.sample(HARD_NEGATIVES, 3)))
+        add("clean", "hard_negative", c, resume(c, random.sample(HARD_NEGATIVES, 1)))
 
-all_payloads = {**PAYLOADS, **EXTRA_PAYLOADS}
-places = ["end", "middle", "summary"]
-i = 0
-for pname, ptext in all_payloads.items():
-    for how in ["plain", "zero_width", "homoglyph", "base64", "chatml"]:
-        c = CANDIDATES[i % len(CANDIDATES)]
-        add("injection", f"{pname}/{how}", c, resume(c, inject=transform(ptext, how), where=places[i % 3]))
-        i += 1
-for pname, ptext in TRANSLATED.items():
-    for where in ["end", "middle"]:
-        c = CANDIDATES[i % len(CANDIDATES)]
-        add("injection", f"{pname}/translated", c, resume(c, inject=ptext, where=where))
-        i += 1
-for k, s in enumerate(STUFFING):
-    for how in ["plain", "zero_width", "homoglyph"]:
-        c = CANDIDATES[(i + k) % len(CANDIDATES)]
-        add("stuffing", f"stuffing{k}/{how}", c, resume(c, inject=transform(s, how), where="end"))
-        i += 1
+    all_payloads = {**PAYLOADS, **EXTRA_PAYLOADS}
+    places = ["end", "middle", "summary"]
+    i = 0
+    for pname, ptext in all_payloads.items():
+        for how in ["plain", "zero_width", "homoglyph", "base64", "chatml"]:
+            c = CANDIDATES[i % len(CANDIDATES)]
+            add("injection", f"{pname}/{how}", c, resume(c, inject=transform(ptext, how), where=places[i % 3]))
+            i += 1
+    for pname, ptext in TRANSLATED.items():
+        for where in ["end", "middle"]:
+            c = CANDIDATES[i % len(CANDIDATES)]
+            add("injection", f"{pname}/translated", c, resume(c, inject=ptext, where=where))
+            i += 1
+    for k, s in enumerate(STUFFING):
+        for how in ["plain", "zero_width", "homoglyph"]:
+            c = CANDIDATES[(i + k) % len(CANDIDATES)]
+            add("stuffing", f"stuffing{k}/{how}", c, resume(c, inject=transform(s, how), where="end"))
+            i += 1
 
-out = Path(__file__).parent / "data" / "resumes.jsonl"
-out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
-from collections import Counter
-print(len(rows), Counter(r["label"] for r in rows), "->", out)
+    out = Path(__file__).parent / "data" / "resumes.jsonl"
+    out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+    from collections import Counter
+    print(len(rows), Counter(r["label"] for r in rows), "->", out)
+    return rows
+
+
+if __name__ == "__main__":
+    build()

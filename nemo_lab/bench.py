@@ -13,6 +13,7 @@ import defenses, grader, jev_client  # noqa: E401
 from nemoguardrails import LLMRails, RailsConfig
 
 REPEATS = int(os.environ.get("REPEATS", "2"))
+FRESH = os.environ.get("FRESH") == "1"  # ignore cached results in OUT
 ROWS = [json.loads(l) for l in open(os.environ.get("DATA", "data/resumes.jsonl"))]
 OUT = Path(os.environ.get("OUT", "results")); OUT.mkdir(exist_ok=True)
 
@@ -84,7 +85,7 @@ async def main():
         det["regex_porto"][r["id"]] = {"blocked": b, "ms": [ms], **extra}
     for cfg, name in [("selfcheck", "nemo_selfcheck_llm"), ("jev", "nemo_jev"), ("cascade", "nemo_jev_llm_cascade")]:
         cache = OUT / f"det_{name}.json"
-        if cache.exists():
+        if cache.exists() and not FRESH:
             det[name] = json.loads(cache.read_text()); print("cached", name, flush=True); continue
         print("running", name, flush=True)
         det[name] = await run_nemo(cfg)
@@ -93,7 +94,7 @@ async def main():
             sys.exit(f"{name}: {errs} rail errors, not caching")
         cache.write_text(json.dumps(det[name]))
     gcache = OUT / "grades.json"
-    if gcache.exists():
+    if gcache.exists() and not FRESH:
         grades = json.loads(gcache.read_text())
     else:
         print("running grader (vulnerable + fixed)", flush=True)

@@ -63,7 +63,7 @@ async def rail_blocked(rails, text):
 
 async def run_arm(arm, cfg):
     path = OUT / f"{arm}.jsonl"
-    if path.exists():
+    if path.exists() and os.environ.get("FRESH") != "1":
         return [json.loads(l) for l in open(path)]
     rails = LLMRails(RailsConfig.from_path(f"rails/{cfg}")) if cfg else None
     episodes = []
