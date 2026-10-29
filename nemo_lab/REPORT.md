@@ -124,7 +124,8 @@ Single-grade results looked like 5 wins. Re-grading each winner and each clean r
   grader once. Verified numbers above come from 6 re-grades.
 * Text is fed after extraction. PDF hiding (white text, 1 px fonts, metadata) is not exercised here.
 * Single region, single day, two repetitions. Latency includes NeMo overhead and network to the APIs.
-* Cost not measured precisely: Jev used 270k tokens for the main set (3 nouls × 194 calls).
+* Cost not measured precisely: on the main set Jev used about 270k tokens over roughly 390 calls (Jev and
+  cascade rails, two repetitions each), about 700 tokens per resume.
   The LLM judge makes one DeepSeek call per resume.
 
 ## Reproduce
